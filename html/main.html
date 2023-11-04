@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>API Call Example</title>
+  </head>
+  <body>
+    <input type="text" id="searchInput" placeholder="Enter a card name" />
+    <button onclick="searchAPI()">Search</button>
+    <p id="output"></p>
+
+    <script>
+      function searchAPI() {
+        var query = document.getElementById('searchInput').value
+        var url = 'https://api.scryfall.com/cards/search?q=' + query
+
+        var xhr = new XMLHttpRequest()
+        xhr.open('GET', url, true)
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === 4 && xhr.status === 200) {
+            var response = JSON.parse(xhr.responseText)
+            displayResponse(response)
+          }
+        }
+        xhr.send()
+      }
+
+      function displayResponse(response) {
+        var outputDiv = document.getElementById('output')
+
+        // Clear the existing content in the output div
+        outputDiv.innerHTML = ''
+
+        response.data.forEach(function (card) {
+          var paragraph = document.createElement('p')
+          paragraph.textContent =
+            card['name'] +
+            ', ' +
+            card['set_name'] +
+            ', $' +
+            card['prices']['usd'] //JSON.stringify(card, null, 2)
+
+          // Create an image element for the picture
+          var image = document.createElement('img')
+          image.src = card['image_uris']['normal']
+          image.alt = card['name'] // Optional: Set alt text for the image
+
+          outputDiv.appendChild(paragraph)
+          outputDiv.appendChild(image)
+        })
+      }
+
+      function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+          searchAPI()
+        }
+      }
+
+      // Attach the "keypress" event handler to the input field
+      document
+        .getElementById('searchInput')
+        .addEventListener('keypress', handleKeyPress)
+    </script>
+  </body>
+</html>
